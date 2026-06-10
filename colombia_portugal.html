@@ -3,7 +3,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Colombia vs Portugal &mdash; model dashboard</title>
 <style>
-.wc-page { margin:0; padding:24px; background:#ECEEF1; }
+.wc-page { margin:0; padding:0; background:transparent; }
 .wc-dash { --bg:#1D1D25; --surface:#22222B; --surface2:#2A2A33;
   --green:#00C357; --green-d:#00A849; --red:#F0513D;
   --line:#2F2F38; --muted:#8A8F9C; --ink:#F4F9FF; --head:#2A2A33;
@@ -163,7 +163,7 @@
 .wc-dash .gridfooter strong { color:#fff; }
 
 @media (max-width:820px) {
-  .wc-page { padding:10px; }
+  .wc-page { padding:0; }
   .wc-dash { padding:16px 12px 12px; }
   .wc-dash .container { grid-template-columns:1fr; gap:10px; }
   .wc-dash .scorebar .teams { font-size:18px; }
@@ -217,7 +217,36 @@
     <div class="brand"><span class="check"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 12.6 L10 17.4 L19 6.8" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pro-badge">PRO</span></div>
   </div>
 
-  <div class='topbox'><div class='topbox-title'>Top value plays <span class='tvp-count'>18 +EV across all markets</span></div><div class='plays-scroll'><table class='plays'><tr><th class='l'>Bet</th><th>Best Odds</th><th class='col-book'>Book</th><th>Model</th><th>Edge</th></tr><tr><td class='play'><span class='dot dot-pos'></span>Under 1.5</td><td class='odds'>+220</td><td class='bookcell'><span class='bookchip bookchip-logo'><img class='booklogo' src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADBCAYAAAHuh480AAAACXBIWXMAABYlAAAWJQFJUiTw
+  <div class='topbox'><div class='topbox-title'>Top value plays <span class='tvp-count'>18 +EV across all markets</span></div><div class='plays-scroll'><table class='plays'><tr><th class='l'>Bet</th><th>Best Odds</th><th class='col-book'>Book</th><th>Model</th><th>Edge</th></tr><tr><td class='play'><span class='dot dot-pos'></span>COL win</td><td class='odds'>+260</td><td class='bookcell'><span class='bookchip bookchip-logo'><img class='booklogo' src='data:image/png;base64,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' alt='BetRivers'/></span></td><td>30.1%</td><td><span class='edge-pill' style='background:rgba(0,195,87,.16);color:#54E098'>+2.3%</span></td></tr>
+<tr><td class='play'><span class='dot dot-pos'></span>Under 1.5</td><td class='odds'>+220</td><td class='bookcell'><span class='bookchip bookchip-logo'><img class='booklogo' src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADBCAYAAAHuh480AAAACXBIWXMAABYlAAAWJQFJUiTw
 AAAUZklEQVR4nO1d32sdxRfPnxC80+ev3GfRFKVExBgsRSkJlmTz0oLtY/P0vZlKWvvQCiZB
 aR8k+T5YlP4IWirapCiFFpqbp4Zig4IFNZR+8xj71KJcbl9kv3zWbL6b7ezuzM7Mzu7dc+HQ
 9nbvzJzzOZ8zZ37sTF9fER/GPd+W9NksnPVuBd1nfweiUlDS89oVtH97kPp8agWhTH61EHz/
@@ -388,35 +417,6 @@ ZbyhKgCsy0hc/h1bmUgOg3Jc2otXAAgnze61SDnxnGbuZsgKAKdDUyOiOwo4rmwwFj90BYBD
 5J85c0Fsidvcx49ZARBxT90VkbvZG5ybGbsCIJD+OMT0lhevAHhp1JwBnDg1ZwAnTs0ZwIlT
 cwZw4rT/cY3WTOBEaf/zMvTzLK0ZwcnS8UeK6PaOsf94NY7M8k9uTHm6e2cOaG7PCjGanb7d
 X8yx/zGo5/gfcoPenwBEI9EAAAAASUVORK5CYII=' alt='FanDuel'/></span></td><td>58.1%</td><td><span class='edge-pill' style='background:rgba(0,195,87,.16);color:#54E098'>+1.9%</span></td></tr>
-<tr><td class='play'><span class='dot dot-pos'></span>COL win</td><td class='odds'>+255</td><td class='bookcell'><span class='bookchip bookchip-logo'><img class='booklogo' src='data:image/png;base64,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' alt='BetRivers'/></span></td><td>30.1%</td><td><span class='edge-pill' style='background:rgba(0,195,87,.16);color:#54E098'>+1.9%</span></td></tr>
 <tr><td class='play'><span class='dot dot-pos'></span>COL 1&ndash;0 POR</td><td class='odds'>+950</td><td class='bookcell'><span class='bookchip bookchip-logo'><img class='booklogo' src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgCAYAAAGVn0euAAAACXBIWXMAAAsTAAALEwEAmpwY
 AAAHMUlEQVR4nO1dvXIbNxDeR+AbmI+gR+Aj+BH0BlGndRWWdhU6ndVQSZkUzoxLZ4ZFUtqj
 SqWGlVOKpUtkliQs6IifXWBxuNPxm9nRiAQOu9jFAljsgQAENIZNICmMkQqLD4wKLnz/g6+C
@@ -1503,7 +1503,7 @@ Lxh3SV7ZNGwAAAAASUVORK5CYII=' alt='DraftKings'/></span></td><td>51.2%</td><td><s
 <div class='bets-wrap'>
 <table class='bets'>
 <tr><th class='l'>Bet</th><th>Best Odds</th><th class='col-book'>Book</th><th>Model</th><th>Edge</th></tr>
-<tr><td class='bet-label'>COL win</td><td class='odds'>+255</td><td class='bookcell'><span class='bookchip bookchip-logo'><img class='booklogo' src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEsAAABLCAYAAAFPSUp8AAAACXBIWXMAAAsTAAALEwEAmpwY
+<tr><td class='bet-label'>COL win</td><td class='odds'>+260</td><td class='bookcell'><span class='bookchip bookchip-logo'><img class='booklogo' src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEsAAABLCAYAAAFPSUp8AAAACXBIWXMAAAsTAAALEwEAmpwY
 AAAFxElEQVR4nO1czWojRxDuZ+hrDrsSbCAmwQItGCKjsGEFMVh4IeDLGnL04lx8lI6bi81e
 A87FR80xe1nIA+gJsk+QeQLnCRqH0kpOe9RdXVVd82PswwdG7ml/89VPV1e3bOzOz7cUmOoH
 7q+v7jDYPwwP9AdtsDWw+ovNZ9PpBB/osBk/X399N+DTh+/CL7MZsDs6lHF068+25LERuYxY
@@ -1531,7 +1531,7 @@ rFX5VwGeD41D6m2Ozom1rCzPGskZ8Pf1i9uT41fsSxwPRqyyxu5o3V3SRsPwoqU+F3iylvcZ
 rcNjh0Az/HIAW6LGxCqFYQT7r83NSljCOftDSNYQVtI2TNDbi/4q39UqViH0Ds09IdRK1PtB
 1DCl7i5YYl0I8460gqcIp+VxkGJS3sYS62T935/q+gJOVw5KYv9OwWh9CdEl0NSpMRhUuhDF
 wnQjXGP/X2KmuO1oOkQ3MJI7jsvA/YMU6mglU6NB4yRIJJZ9wMjNa49KLJsZoo9SLFtJK9QF
-4dGLZT3hUjuFJ7F26OI9ibVDD9n/AC/7JGqgryrYAAAAAElFTkSuQmCC' alt='BetRivers'/></span></td><td>30.1%</td><td class='edge-cell'><span class='edge-pill' style='background:rgba(0,195,87,.16);color:#54E098'>+1.9%</span></td></tr>
+4dGLZT3hUjuFJ7F26OI9ibVDD9n/AC/7JGqgryrYAAAAAElFTkSuQmCC' alt='BetRivers'/></span></td><td>30.1%</td><td class='edge-cell'><span class='edge-pill' style='background:rgba(0,195,87,.16);color:#54E098'>+2.3%</span></td></tr>
 <tr><td class='bet-label'>Draw</td><td class='odds'>+240</td><td class='bookcell'><span class='bookchip bookchip-logo'><img class='booklogo' src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgCAYAAAGVn0euAAAACXBIWXMAAAsTAAALEwEAmpwY
 AAAHMUlEQVR4nO1dvXIbNxDeR+AbmI+gR+Aj+BH0BlGndRWWdhU6ndVQSZkUzoxLZ4ZFUtqj
 SqWGlVOKpUtkliQs6IifXWBxuNPxm9nRiAQOu9jFAljsgQAENIZNICmMkQqLD4wKLnz/g6+C
@@ -1568,7 +1568,7 @@ ZbyhKgCsy0hc/h1bmUgOg3Jc2otXAAgnze61SDnxnGbuZsgKAKdDUyOiOwo4rmwwFj90BYBD
 5J85c0Fsidvcx49ZARBxT90VkbvZG5ybGbsCIJD+OMT0lhevAHhp1JwBnDg1ZwAnTs0ZwIlT
 cwZw4rT/cY3WTOBEaf/zMvTzLK0ZwcnS8UeK6PaOsf94NY7M8k9uTHm6e2cOaG7PCjGanb7d
 X8yx/zGo5/gfcoPenwBEI9EAAAAASUVORK5CYII=' alt='FanDuel'/></span></td><td>27.6%</td><td class='edge-cell'><span class='edge-pill' style='background:rgba(240,81,61,.14);color:#FF8E7E'>-1.9%</span></td></tr>
-<tr><td class='bet-label'>POR win</td><td class='odds'>+115</td><td class='bookcell'><span class='bookchip bookchip-logo'><img class='booklogo' src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAAHaX54IAAAACXBIWXMAAAsTAAALEwEAmpwY
+<tr><td class='bet-label'>POR win</td><td class='odds'>+120</td><td class='bookcell'><span class='bookchip bookchip-logo'><img class='booklogo' src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAAHaX54IAAAACXBIWXMAAAsTAAALEwEAmpwY
 AAASIElEQVR4nO1dMW8ctxLWT9h/kF/w/AuSX5D8AqdiKas+wG6s8l2tAE5zKq1ahdmocGEJ
 SKMIUgAFBxfPkP2AZ+AiQClOhV3oYc6iQ63JXXJ3yBkuZ4CBZeluuZyPHzkkh8MtpZu71Lol
 hajizQWStJDV7dWmkK6CXH+LKsSI62/z337y/n2QuUBiTDm4EJ8EF2I+3P7S+vMNXiGmgMO3
@@ -1655,7 +1655,7 @@ Rgjia4w1X9x59O5X8h5bMVMZQSZ0+c5QUtQ6v1BCEPy0P6VL1z0loo2MIBiNACaufRdXlnCL
 lWgjLlbORgANERpkzuvegAQwcYcRTojQiIs1hV6vvfcBK2jg9hg1v4fPwGdljtCQYSWTdAaE
 EW3Y2kAIwgAE0YatDYQgDEAQbdjaQAjCAATRhq0NhCAMQBBt2NpACMIABNGGrQ2EIAxAEG3Y
 2kAIwgAE0YatDYQgDEAQbdjaQAjCAATRhq0NhCAMQBBt2NpACMIABNGGrQ2EIAxAEG3Y2uD/
-Lxh3SV7ZNGwAAAAASUVORK5CYII=' alt='DraftKings'/></span></td><td>42.4%</td><td class='edge-cell'><span class='edge-pill' style='background:rgba(240,81,61,.30);color:#FF8E7E'>-4.1%</span></td></tr>
+Lxh3SV7ZNGwAAAAASUVORK5CYII=' alt='DraftKings'/></span></td><td>42.4%</td><td class='edge-cell'><span class='edge-pill' style='background:rgba(240,81,61,.14);color:#FF8E7E'>-3.1%</span></td></tr>
 </table></div>
       <h2>Double Chance</h2>
 <div class='bets-wrap'>
