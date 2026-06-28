@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Colombia vs Ghana &mdash; model dashboard</title>
+<style>
+.wc-page { margin:0; padding:0; background:transparent; }
+.wc-dash { --bg:#1D1D25; --surface:#22222B; --surface2:#2A2A33;
+  --green:#00C357; --green-d:#00A849; --red:#F0513D;
+  --line:#2F2F38; --muted:#8A8F9C; --ink:#F4F9FF; --head:#2A2A33;
+  font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
+  background:var(--bg); color:var(--ink); line-height:1.45; border-radius:14px;
+  padding:20px 20px 16px; box-sizing:border-box; -webkit-font-smoothing:antialiased; }
+.wc-dash *, .wc-dash *::before, .wc-dash *::after { box-sizing:inherit; }
+
+/* scorebar header with PRO badge — compact single band */
+.wc-dash .scorebar { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap;
+  gap:10px 18px; background:var(--surface); border:1px solid var(--line); border-radius:12px;
+  padding:13px 18px; margin-bottom:18px; }
+.wc-dash .sb-titles { flex:0 1 auto; order:1; }
+.wc-dash .scorebar .teams { font-size:22px; font-weight:800; letter-spacing:-.3px; color:var(--ink);
+  display:flex; align-items:center; gap:8px; }
+.wc-dash .scorebar .teams .vs { color:var(--muted); font-weight:700; font-size:16px; }
+.wc-dash .scorebar .teams .flag { height:24px; width:32px; flex:0 0 auto; border-radius:3px; vertical-align:middle;
+  box-shadow:0 0 0 1px rgba(255,255,255,.08); }
+.wc-dash .scorebar .meta { font-size:11px; text-transform:uppercase; letter-spacing:.6px;
+  color:var(--muted); margin-top:5px; font-weight:700; }
+.wc-dash .scorebar .meta-date { color:#C2C7D0; }
+.wc-dash .scorebar .meta-date::before { content:' \00b7  '; }
+.wc-dash .scorebar .pills { flex:0 1 auto; order:2; display:flex; flex-wrap:wrap; gap:8px; margin:0; }
+.wc-dash .scorebar .pill { background:#2C2C36; color:#C2C7D0; border-radius:7px; padding:7px 12px;
+  font-size:13px; font-family:ui-monospace,Menlo,Consolas,monospace; }
+.wc-dash .scorebar .pill b { color:var(--ink); }
+.wc-dash .brand { flex:0 0 auto; order:3; display:flex; align-items:center; gap:11px; }
+.wc-dash .brand .check { width:40px; height:40px; border-radius:50%; background:var(--green);
+  display:inline-flex; align-items:center; justify-content:center; }
+.wc-dash .brand .check svg { width:28px; height:28px; display:block; }
+.wc-dash .brand .pro-badge { background:#0078F0; color:#fff; font-weight:800; font-size:17px;
+  letter-spacing:.5px; padding:7px 13px; border-radius:8px; }
+
+/* top value plays card */
+.wc-dash .topbox { border:1px solid var(--line); border-radius:10px; background:var(--surface);
+  overflow:hidden; margin-bottom:22px; }
+.wc-dash .topbox-title { background:var(--green); color:#fff; font-size:11px; font-weight:800;
+  text-transform:uppercase; letter-spacing:.7px; padding:7px 14px; display:flex; align-items:center; gap:7px; }
+.wc-dash .topbox-title::before { content:''; width:6px; height:6px; border-radius:50%; background:#fff; opacity:.95; }
+.wc-dash .topbox-muted { padding:12px 14px; color:var(--muted); font-size:13px; border-left:4px solid var(--line); }
+.wc-dash .topbox-muted code { background:#2C2C36; padding:1px 5px; border-radius:4px; color:#C2C7D0; }
+.wc-dash table.plays { border-collapse:collapse; width:100%; font-size:13px; }
+.wc-dash table.plays th { text-align:right; font-size:10px; text-transform:uppercase; letter-spacing:.4px;
+  color:var(--muted); font-weight:700; padding:8px 14px 4px; }
+.wc-dash table.plays td { text-align:right; padding:7px 14px; border-top:1px solid var(--line); }
+.wc-dash table.plays th.l, .wc-dash table.plays td.play { text-align:left; }
+.wc-dash table.plays td.play { font-weight:700; color:var(--ink); }
+.wc-dash table.plays td.mkt { color:var(--muted); }
+.wc-dash table.plays td.odds { font-family:ui-monospace,Menlo,Consolas,monospace; color:#C2C7D0; }
+/* Top-value-plays scroll: ~5 rows visible, scroll through the rest; header stays put */
+.wc-dash .plays-scroll { max-height:210px; overflow-y:auto; scrollbar-gutter:stable;
+  background:
+    linear-gradient(var(--surface) 30%, rgba(34,34,43,0)) center top,
+    linear-gradient(rgba(34,34,43,0), var(--surface) 72%) center bottom,
+    radial-gradient(farthest-side at 50% 0,   rgba(0,0,0,.5), rgba(0,0,0,0)) center top,
+    radial-gradient(farthest-side at 50% 100%, rgba(0,0,0,.5), rgba(0,0,0,0)) center bottom;
+  background-repeat:no-repeat; background-size:100% 30px, 100% 40px, 100% 13px, 100% 13px;
+  background-attachment:local, local, scroll, scroll; }
+.wc-dash .plays-scroll table.plays th { position:sticky; top:0; z-index:2; background:var(--surface); }
+.wc-dash .tvp-count { margin-left:auto; font-weight:800; font-size:12px; letter-spacing:.3px; opacity:1;
+  text-transform:none; }
+.wc-dash table.plays th.col-book, .wc-dash table.bets th.col-book { text-align:center; }
+.wc-dash .dot { display:inline-block; width:9px; height:9px; border-radius:50%; margin-right:9px; vertical-align:middle; }
+.wc-dash .dot-pos { background:var(--green); box-shadow:0 0 0 3px rgba(0,195,87,.18); }
+.wc-dash .dot-neg { background:var(--red); box-shadow:0 0 0 3px rgba(240,81,61,.18); }
+.wc-dash .cs-best { font-size:12px; color:var(--muted); padding:10px 14px; border-top:1px solid var(--line); }
+.wc-dash .cs-best strong { color:var(--ink); }
+.wc-dash .longshot { color:#E0A23D; }
+
+/* layout */
+.wc-dash .container { display:grid; grid-template-columns:1.05fr 1fr; gap:28px; align-items:start; }
+.wc-dash .panel { min-width:0; }
+.wc-dash h2 { font-size:12px; text-transform:uppercase; letter-spacing:.6px; color:var(--ink);
+  font-weight:800; margin:0 0 4px; padding-bottom:7px; border-bottom:1px solid var(--line); }
+
+/* bet tables */
+.wc-dash .bets-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; box-sizing:border-box; }
+/* Scrolled markets reserve a scrollbar gutter (scrollbar-gutter:stable below), making them
+   ~11px narrower; reserve the same gutter on non-scrolled markets so the fixed columns —
+   especially the BOOK logo — line up across every section. */
+.wc-dash .bets-wrap:not(.bets-scroll) { padding-right:11px; }
+.wc-dash table.bets { border-collapse:collapse; width:100%; font-size:13px; margin-bottom:22px; }
+.wc-dash table.bets th, .wc-dash table.bets td { padding:7px 10px; text-align:right; border-bottom:1px solid #26262E; }
+.wc-dash table.bets th { color:var(--muted); font-weight:700; font-size:10px;
+  text-transform:uppercase; letter-spacing:.4px; border-bottom:1px solid var(--line); }
+.wc-dash table.bets tr:hover td { background:#26262E; }
+.wc-dash table.bets th.l, .wc-dash table.bets td.bet-label { text-align:left; }
+.wc-dash table.bets td.bet-label { font-weight:600; color:var(--ink); }
+.wc-dash table.bets td.odds { font-family:ui-monospace,Menlo,Consolas,monospace; color:#C2C7D0; }
+.wc-dash table.bets td.mkt { color:var(--muted); }
+.wc-dash table.bets td.bookcell, .wc-dash table.plays td.bookcell { text-align:center; vertical-align:middle; }
+.wc-dash .bookchip { display:inline-flex; align-items:center; justify-content:center;
+  min-width:32px; height:20px; padding:0 6px; border-radius:5px; font-size:10px; font-weight:800;
+  letter-spacing:.3px; font-family:ui-monospace,Menlo,Consolas,monospace; line-height:1; vertical-align:middle; }
+.wc-dash .bookchip-na { background:transparent; color:var(--muted); font-weight:400; min-width:0; padding:0; }
+.wc-dash .bookchip-logo { display:inline-flex; align-items:center; justify-content:center;
+  background:transparent; padding:0; min-width:0; height:22px; vertical-align:middle; }
+.wc-dash .booklogo { width:22px; height:22px; object-fit:contain; display:block; border-radius:4px; vertical-align:middle; }
+.wc-dash table.bets td.edge-cell { padding-top:5px; padding-bottom:5px; }
+.wc-dash .edge-pill { display:inline-block; box-sizing:border-box; width:62px; border-radius:6px;
+  padding:3px 0; font-weight:800; font-size:12px; text-align:center; }
+
+/* fixed column widths so every market table AND the plays table line up identically */
+.wc-dash table.bets, .wc-dash table.plays { table-layout:fixed; }
+.wc-dash table.bets th:nth-child(2), .wc-dash table.plays th:nth-child(2) { width:78px; }  /* best odds */
+.wc-dash table.bets th:nth-child(3), .wc-dash table.plays th:nth-child(3) { width:58px; }  /* book */
+.wc-dash table.bets th:nth-child(4), .wc-dash table.plays th:nth-child(4) { width:58px; }  /* model */
+.wc-dash table.bets th:nth-child(5), .wc-dash table.plays th:nth-child(5) { width:78px; }  /* edge */
+.wc-dash table.bets td.bet-label, .wc-dash table.plays td.play {
+  white-space:normal; overflow-wrap:anywhere; }
+
+/* per-market scroll: markets with >5 rows show ~5, sticky header, rest scrollable */
+.wc-dash .bets-scroll { max-height:206px; overflow-y:auto; scrollbar-gutter:stable;
+  /* fade + shadow at the edges as a persistent scroll-for-more cue (auto-hides at the ends) */
+  background:
+    linear-gradient(var(--bg) 30%, rgba(29,29,37,0)) center top,
+    linear-gradient(rgba(29,29,37,0), var(--bg) 72%) center bottom,
+    radial-gradient(farthest-side at 50% 0,   rgba(0,0,0,.5), rgba(0,0,0,0)) center top,
+    radial-gradient(farthest-side at 50% 100%, rgba(0,0,0,.5), rgba(0,0,0,0)) center bottom;
+  background-repeat:no-repeat; background-size:100% 30px, 100% 40px, 100% 13px, 100% 13px;
+  background-attachment:local, local, scroll, scroll; }
+.wc-dash .bets-scroll table.bets { margin-bottom:0; }
+.wc-dash .bets-scroll table.bets th { position:sticky; top:0; z-index:2; background:var(--bg); }
+
+/* prominent scrollbars for every scroll container (desktop + mobile) */
+.wc-dash .bets-scroll, .wc-dash .plays-scroll {
+  scrollbar-width:thin; scrollbar-color:#8A9AA0 rgba(255,255,255,.08); }
+.wc-dash .bets-scroll::-webkit-scrollbar, .wc-dash .plays-scroll::-webkit-scrollbar { width:11px; height:11px; }
+.wc-dash .bets-scroll::-webkit-scrollbar-track, .wc-dash .plays-scroll::-webkit-scrollbar-track {
+  background:rgba(255,255,255,.08); border-radius:7px; }
+.wc-dash .bets-scroll::-webkit-scrollbar-thumb, .wc-dash .plays-scroll::-webkit-scrollbar-thumb {
+  background:#8A9AA0; border-radius:7px; border:2px solid var(--bg); min-height:34px; }
+.wc-dash .plays-scroll::-webkit-scrollbar-thumb { border-color:var(--surface); }
+.wc-dash .bets-scroll::-webkit-scrollbar-thumb:hover, .wc-dash .plays-scroll::-webkit-scrollbar-thumb:hover {
+  background:#B4C2C8; }
+
+/* score grid (cells rendered as shaded pills) */
+.wc-dash .grid-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+.wc-dash table.scoregrid { border-collapse:separate; border-spacing:5px; font-size:13px;
+  margin:0 auto; width:100%; max-width:760px; table-layout:fixed; }
+.wc-dash table.scoregrid col.c-axis { width:30px; }
+.wc-dash table.scoregrid col.c-idx { width:24px; }
+.wc-dash table.scoregrid td { border:none; padding:0; text-align:center; }
+.wc-dash table.scoregrid td.corner { color:var(--ink); font-weight:700; font-size:12px; }
+.wc-dash table.scoregrid td.gridhdr { color:var(--ink); font-weight:700; font-size:14px; }
+.wc-dash table.scoregrid td.teamhdr { font-size:14px; padding-bottom:4px; }
+.wc-dash table.scoregrid td.teamhdr .flag-grid { height:16px; width:auto; border-radius:2px;
+  vertical-align:middle; margin-right:7px; box-shadow:0 0 0 1px rgba(255,255,255,.1); }
+.wc-dash table.scoregrid td.axis-label { vertical-align:middle; color:var(--ink); }
+.wc-dash table.scoregrid td.axis-label .flag-axis { height:16px; width:auto; border-radius:2px;
+  display:block; margin:10px auto 0; transform:rotate(-90deg); box-shadow:0 0 0 1px rgba(255,255,255,.1); }
+.wc-dash table.scoregrid td.axis-label span { display:inline-block; white-space:nowrap;
+  writing-mode:vertical-rl; transform:rotate(180deg); font-size:13px; font-weight:700; }
+.wc-dash .cell-pill { display:flex; align-items:center; justify-content:center; border-radius:6px;
+  width:100%; height:26px; font-weight:700; font-size:12px; }
+.wc-dash .gridfooter { font-size:12px; color:#D6DAE1; margin-top:12px; margin-bottom:20px; }
+.wc-dash .gridfooter strong { color:#fff; }
+
+@media (max-width:820px) {
+  .wc-page { padding:0; }
+  .wc-dash { padding:16px 12px 12px; }
+  .wc-dash .container { grid-template-columns:1fr; gap:10px; }
+  .wc-dash .scorebar .teams { font-size:18px; }
+  .wc-dash .scorebar { align-items:flex-start; }
+  .wc-dash .brand { order:0; flex-basis:100%; justify-content:center; margin-bottom:6px; }
+  .wc-dash .sb-titles { flex:1 1 100%; min-width:0; order:1; }
+  .wc-dash .scorebar .pills { order:3; flex-basis:100%; justify-content:flex-start; }
+  .wc-dash .scorebar .meta-date { display:block; margin-top:3px; }
+  .wc-dash .scorebar .meta-date::before { content:''; }
+  .wc-dash .brand .check { width:34px; height:34px; }
+  .wc-dash .brand .check svg { width:24px; height:24px; }
+  .wc-dash .brand .pro-badge { font-size:14px; padding:5px 10px; }
+  /* bet + plays tables: hide secondary Market column so Bet/Odds/Model/Edge fit */
+  .wc-dash .bookchip { min-width:26px; height:18px; font-size:9px; padding:0 4px; }
+  .wc-dash .booklogo { width:20px; height:20px; }
+  .wc-dash .bookchip-logo { height:20px; }
+  .wc-dash table.bets th, .wc-dash table.bets td { padding:7px 6px; font-size:12px; }
+  .wc-dash table.bets th { font-size:9px; letter-spacing:.2px; }
+  .wc-dash table.plays th, .wc-dash table.plays td { padding:7px 6px; }
+  .wc-dash table.plays { font-size:12px; }
+  .wc-dash table.plays th { font-size:9px; letter-spacing:.2px; }
+  /* shrink the fixed numeric columns on mobile so the Bet name has room to wrap */
+  .wc-dash table.bets th:nth-child(2), .wc-dash table.plays th:nth-child(2) { width:62px; }
+  .wc-dash table.bets th:nth-child(3), .wc-dash table.plays th:nth-child(3) { width:44px; }
+  .wc-dash table.bets th:nth-child(4), .wc-dash table.plays th:nth-child(4) { width:50px; }
+  .wc-dash table.bets th:nth-child(5), .wc-dash table.plays th:nth-child(5) { width:56px; }
+  /* more breathing room between markets on mobile */
+  .wc-dash h2 { margin-top:24px; }
+  .wc-dash table.bets { margin-bottom:8px; }
+  .wc-dash .bets-scroll { margin-bottom:8px; }
+  .wc-dash .edge-pill { width:48px; font-size:11px; padding:3px 0; }
+  /* score grid: keep cells readable, scroll horizontally if it overflows */
+  .wc-dash table.scoregrid { min-width:430px; border-spacing:4px; }
+  .wc-dash .cell-pill { height:26px; font-size:12px; }
+  .wc-dash table.scoregrid td.gridhdr, .wc-dash table.scoregrid td.teamhdr { font-size:12px; }
+}
+</style>
+</head><body class="wc-page">
+<div class="wc-dash">
+
+  <div class="scorebar">
+    <div class="sb-titles">
+      <div class="teams"><img class='flag' src='https://flagcdn.com/h40/co.png' alt='' loading='lazy'>Colombia <span class="vs">vs</span> <img class='flag' src='https://flagcdn.com/h40/gh.png' alt='' loading='lazy'>Ghana</div>
+      <div class="meta">Knockout &middot; neutral venue<span class="meta-date">Arrowhead Stadium, Kansas City &middot; July 3, 2026 · 9:30 PM ET</span></div>
+    </div>
+    <div class="pills">
+      <span class="pill">xG COL <b>1.88</b></span>
+      <span class="pill">xG GHA <b>0.66</b></span>
+      <span class="pill">xG total <b>2.54</b></span>
+    </div>
+    <div class="brand"><span class="check"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 12.6 L10 17.4 L19 6.8" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pro-badge">PRO</span></div>
+  </div>
+
+  <div class='topbox topbox-muted'>Market odds not loaded for this match &mdash; showing model probabilities only. Drop the multi-book export at <code>odds/worldcup_odds.csv</code> to populate edge.</div>
+
+  <div class="container">
+    <div class="panel">
+      <h2>1X2 (Moneyline)</h2>
+<div class='bets-wrap'>
+<table class='bets'>
+<tr><th class='l'>Bet</th><th>Best Odds</th><th class='col-book'>Book</th><th>Model</th><th>Edge</th></tr>
+<tr><td class='bet-label'>COL win</td><td class='odds'>&mdash;</td><td class='bookcell'><span class='bookchip bookchip-na'>&mdash;</span></td><td>69.0%</td><td class='edge-cell'>&mdash;</td></tr>
+<tr><td class='bet-label'>Draw</td><td class='odds'>&mdash;</td><td class='bookcell'><span class='bookchip bookchip-na'>&mdash;</span></td><td>19.5%</td><td class='edge-cell'>&mdash;</td></tr>
+<tr><td class='bet-label'>GHA win</td><td class='odds'>&mdash;</td><td class='bookcell'><span class='bookchip bookchip-na'>&mdash;</span></td><td>11.5%</td><td class='edge-cell'>&mdash;</td></tr>
+</table></div>
+      <h2>To Advance (incl. ET/pens)</h2>
+<div class='bets-wrap'>
+<table class='bets'>
+<tr><th class='l'>Bet</th><th>Best Odds</th><th class='col-book'>Book</th><th>Model</th><th>Edge</th></tr>
+<tr><td class='bet-label'>COL advance</td><td class='odds'>&mdash;</td><td class='bookcell'><span class='bookchip bookchip-na'>&mdash;</span></td><td>81.8%</td><td class='edge-cell'>&mdash;</td></tr>
+<tr><td class='bet-label'>GHA advance</td><td class='odds'>&mdash;</td><td class='bookcell'><span class='bookchip bookchip-na'>&mdash;</span></td><td>18.2%</td><td class='edge-cell'>&mdash;</td></tr>
+</table></div>
+      <h2>Decided in Extra Time (bet365)</h2>
+<div class='bets-wrap'>
+<table class='bets'>
+<tr><th class='l'>Bet</th><th>Best Odds</th><th class='col-book'>Book</th><th>Model</th><th>Edge</th></tr>
+<tr><td class='bet-label'>Decided in Extra Time &mdash; Yes</td><td class='odds'>&mdash;</td><td class='bookcell'><span class='bookchip bookchip-na'>&mdash;</span></td><td>9.9%</td><td class='edge-cell'>&mdash;</td></tr>
+<tr><td class='bet-label'>Decided in Extra Time &mdash; No</td><td class='odds'>&mdash;</td><td class='bookcell'><span class='bookchip bookchip-na'>&mdash;</span></td><td>90.1%</td><td class='edge-cell'>&mdash;</td></tr>
+</table></div>
+      <h2>Decided After Penalties (bet365)</h2>
+<div class='bets-wrap'>
+<table class='bets'>
+<tr><th class='l'>Bet</th><th>Best Odds</th><th class='col-book'>Book</th><th>Model</th><th>Edge</th></tr>
+<tr><td class='bet-label'>To Penalty Shootout &mdash; Yes</td><td class='odds'>&mdash;</td><td class='bookcell'><span class='bookchip bookchip-na'>&mdash;</span></td><td>9.6%</td><td class='edge-cell'>&mdash;</td></tr>
+<tr><td class='bet-label'>To Penalty Shootout &mdash; No</td><td class='odds'>&mdash;</td><td class='bookcell'><span class='bookchip bookchip-na'>&mdash;</span></td><td>90.4%</td><td class='edge-cell'>&mdash;</td></tr>
+</table></div>
+      
+      <h2>Both Teams to Score</h2>
+<div class='bets-wrap'>
+<table class='bets'>
+<tr><th class='l'>Bet</th><th>Best Odds</th><th class='col-book'>Book</th><th>Model</th><th>Edge</th></tr>
+<tr><td class='bet-label'>BTTS Yes</td><td class='odds'>&mdash;</td><td class='bookcell'><span class='bookchip bookchip-na'>&mdash;</span></td><td>42.1%</td><td class='edge-cell'>&mdash;</td></tr>
+<tr><td class='bet-label'>BTTS No</td><td class='odds'>&mdash;</td><td class='bookcell'><span class='bookchip bookchip-na'>&mdash;</span></td><td>57.9%</td><td class='edge-cell'>&mdash;</td></tr>
+</table></div>
+      <h2>Totals (Over / Under)</h2>
+<div class='bets-wrap bets-scroll'>
+<table class='bets'>
+<tr><th class='l'>Bet</th><th>Best Odds</th><th class='col-book'>Book</th><th>Model</th><th>Edge</th></tr>
+<tr><td class='bet-label'>Over 1.5</td><td class='odds'>&mdash;</td><td class='bookcell'><span class='bookchip bookchip-na'>&mdash;</span></td><td>72.1%</td><td class='edge-cell'>&mdash;</td></tr>
+<tr><td class='bet-label'>Under 1.5</td><td class='odds'>&mdash;</td><td class='bookcell'><span class='bookchip bookchip-na'>&mdash;</span></td><td>27.9%</td><td class='edge-cell'>&mdash;</td></tr>
+<tr><td class='bet-label'>Over 2.5</td><td class='odds'>&mdash;</td><td class='bookcell'><span class='bookchip bookchip-na'>&mdash;</span></td><td>47.5%</td><td class='edge-cell'>&mdash;</td></tr>
+<tr><td class='bet-label'>Under 2.5</td><td class='odds'>&mdash;</td><td class='bookcell'><span class='bookchip bookchip-na'>&mdash;</span></td><td>52.5%</td><td class='edge-cell'>&mdash;</td></tr>
+<tr><td class='bet-label'>Over 3.5</td><td class='odds'>&mdash;</td><td class='bookcell'><span class='bookchip bookchip-na'>&mdash;</span></td><td>26.2%</td><td class='edge-cell'>&mdash;</td></tr>
+<tr><td class='bet-label'>Under 3.5</td><td class='odds'>&mdash;</td><td class='bookcell'><span class='bookchip bookchip-na'>&mdash;</span></td><td>73.8%</td><td class='edge-cell'>&mdash;</td></tr>
+<tr><td class='bet-label'>Over 4.5</td><td class='odds'>&mdash;</td><td class='bookcell'><span class='bookchip bookchip-na'>&mdash;</span></td><td>12.5%</td><td class='edge-cell'>&mdash;</td></tr>
+<tr><td class='bet-label'>Under 4.5</td><td class='odds'>&mdash;</td><td class='bookcell'><span class='bookchip bookchip-na'>&mdash;</span></td><td>87.5%</td><td class='edge-cell'>&mdash;</td></tr>
+</table></div>
+      
+    </div>
+    <div class="panel">
+      <h2>Score Probability Grid</h2>
+      <div class='grid-wrap'><table class='scoregrid'><colgroup><col class='c-axis'><col class='c-idx'><col class='c-data'><col class='c-data'><col class='c-data'><col class='c-data'><col class='c-data'></colgroup><tr>
+<td class='corner' colspan='2'>EXTRA TIME<br>(19.5%)</td>
+<td class='gridhdr teamhdr' colspan='5'><img class='flag-grid' src='https://flagcdn.com/h40/gh.png' alt='' loading='lazy'>GHA &mdash; 90 MIN (11.5%)</td>
+</tr>
+<tr>
+<td class='corner'></td>
+<td class='corner'></td>
+<td class='gridhdr'>0</td>
+<td class='gridhdr'>1</td>
+<td class='gridhdr'>2</td>
+<td class='gridhdr'>3</td>
+<td class='gridhdr'>4</td>
+</tr>
+<tr>
+<td class='axis-label' rowspan='8'><span>COL &mdash; 90 MIN (69.0%)</span><img class='flag-axis' src='https://flagcdn.com/h40/co.png' alt='' loading='lazy'></td>
+<td class='gridhdr'>0</td>
+<td><span class='cell-pill' style='background:#2E8C50;color:#DDEFE4'>6.9%</span></td>
+<td><span class='cell-pill' style='background:#2E8C50;color:#DDEFE4'>5.1%</span></td>
+<td><span class='cell-pill' style='background:#2A4F38;color:#9DB3A6'>1.4%</span></td>
+<td><span class='cell-pill' style='background:#21302A;color:#6B7A72'>0.3%</span></td>
+<td><span class='cell-pill' style='background:#1F2A26;color:#6B7A72'>0.0%</span></td>
+</tr>
+<tr>
+<td class='gridhdr'>1</td>
+<td><span class='cell-pill' style='background:#00C357;color:#06210F'>16.0%</span></td>
+<td><span class='cell-pill' style='background:#18A85A;color:#06210F'>8.9%</span></td>
+<td><span class='cell-pill' style='background:#2C6B44;color:#DDEFE4'>3.0%</span></td>
+<td><span class='cell-pill' style='background:#243B30;color:#9DB3A6'>0.6%</span></td>
+<td><span class='cell-pill' style='background:#1F2A26;color:#6B7A72'>0.1%</span></td>
+</tr>
+<tr>
+<td class='gridhdr'>2</td>
+<td><span class='cell-pill' style='background:#18A85A;color:#06210F'>14.2%</span></td>
+<td><span class='cell-pill' style='background:#18A85A;color:#06210F'>9.6%</span></td>
+<td><span class='cell-pill' style='background:#2C6B44;color:#DDEFE4'>3.2%</span></td>
+<td><span class='cell-pill' style='background:#243B30;color:#9DB3A6'>0.7%</span></td>
+<td><span class='cell-pill' style='background:#21302A;color:#6B7A72'>0.1%</span></td>
+</tr>
+<tr>
+<td class='gridhdr'>3</td>
+<td><span class='cell-pill' style='background:#18A85A;color:#06210F'>8.4%</span></td>
+<td><span class='cell-pill' style='background:#2E8C50;color:#DDEFE4'>6.1%</span></td>
+<td><span class='cell-pill' style='background:#2C6B44;color:#DDEFE4'>2.2%</span></td>
+<td><span class='cell-pill' style='background:#243B30;color:#9DB3A6'>0.5%</span></td>
+<td><span class='cell-pill' style='background:#1F2A26;color:#6B7A72'>0.1%</span></td>
+</tr>
+<tr>
+<td class='gridhdr'>4</td>
+<td><span class='cell-pill' style='background:#2C6B44;color:#DDEFE4'>3.7%</span></td>
+<td><span class='cell-pill' style='background:#2C6B44;color:#DDEFE4'>2.9%</span></td>
+<td><span class='cell-pill' style='background:#2A4F38;color:#9DB3A6'>1.1%</span></td>
+<td><span class='cell-pill' style='background:#21302A;color:#6B7A72'>0.3%</span></td>
+<td><span class='cell-pill' style='background:#1F2A26;color:#6B7A72'>0.1%</span></td>
+</tr>
+<tr>
+<td class='gridhdr'>5</td>
+<td><span class='cell-pill' style='background:#2A4F38;color:#9DB3A6'>1.3%</span></td>
+<td><span class='cell-pill' style='background:#2A4F38;color:#9DB3A6'>1.1%</span></td>
+<td><span class='cell-pill' style='background:#21302A;color:#6B7A72'>0.5%</span></td>
+<td><span class='cell-pill' style='background:#21302A;color:#6B7A72'>0.1%</span></td>
+<td><span class='cell-pill' style='background:#1F2A26;color:#6B7A72'>0.0%</span></td>
+</tr>
+<tr>
+<td class='gridhdr'>6</td>
+<td><span class='cell-pill' style='background:#21302A;color:#6B7A72'>0.4%</span></td>
+<td><span class='cell-pill' style='background:#21302A;color:#6B7A72'>0.4%</span></td>
+<td><span class='cell-pill' style='background:#21302A;color:#6B7A72'>0.2%</span></td>
+<td><span class='cell-pill' style='background:#1F2A26;color:#6B7A72'>0.0%</span></td>
+<td><span class='cell-pill' style='background:#1F2A26;color:#6B7A72'>0.0%</span></td>
+</tr>
+<tr>
+<td class='gridhdr'>7</td>
+<td><span class='cell-pill' style='background:#21302A;color:#6B7A72'>0.1%</span></td>
+<td><span class='cell-pill' style='background:#1F2A26;color:#6B7A72'>0.1%</span></td>
+<td><span class='cell-pill' style='background:#1F2A26;color:#6B7A72'>0.0%</span></td>
+<td><span class='cell-pill' style='background:#1F2A26;color:#6B7A72'>0.0%</span></td>
+<td><span class='cell-pill' style='background:#1F2A26;color:#6B7A72'>0.0%</span></td>
+</tr></table></div><div class='gridfooter'>OTHER (rarer scorelines): 0.14% &nbsp;|&nbsp; Most likely: <strong>COL 1-0 GHA (16.0%)</strong></div>
+      <div class='grid-wrap'><table class='scoregrid'><colgroup><col class='c-axis'><col class='c-idx'><col class='c-data'><col class='c-data'><col class='c-data'><col class='c-data'><col class='c-data'></colgroup><tr>
+<td class='corner' colspan='2'>PENALTY SHOOTOUT<br>(9.6%)</td>
+<td class='gridhdr teamhdr' colspan='5'><img class='flag-grid' src='https://flagcdn.com/h40/gh.png' alt='' loading='lazy'>GHA &mdash; 120 MIN (13.4%)</td>
+</tr>
+<tr>
+<td class='corner'></td>
+<td class='corner'></td>
+<td class='gridhdr'>0</td>
+<td class='gridhdr'>1</td>
+<td class='gridhdr'>2</td>
+<td class='gridhdr'>3</td>
+<td class='gridhdr'>4</td>
+</tr>
+<tr>
+<td class='axis-label' rowspan='8'><span>COL &mdash; 120 MIN (77.0%)</span><img class='flag-axis' src='https://flagcdn.com/h40/co.png' alt='' loading='lazy'></td>
+<td class='gridhdr'>0</td>
+<td><span class='cell-pill' style='background:#2C6B44;color:#DDEFE4'>2.6%</span></td>
+<td><span class='cell-pill' style='background:#2E8C50;color:#DDEFE4'>5.6%</span></td>
+<td><span class='cell-pill' style='background:#2A4F38;color:#9DB3A6'>1.5%</span></td>
+<td><span class='cell-pill' style='background:#21302A;color:#6B7A72'>0.3%</span></td>
+<td><span class='cell-pill' style='background:#1F2A26;color:#6B7A72'>0.0%</span></td>
+</tr>
+<tr>
+<td class='gridhdr'>1</td>
+<td><span class='cell-pill' style='background:#00C357;color:#06210F'>17.6%</span></td>
+<td><span class='cell-pill' style='background:#2E8C50;color:#DDEFE4'>4.1%</span></td>
+<td><span class='cell-pill' style='background:#2C6B44;color:#DDEFE4'>3.8%</span></td>
+<td><span class='cell-pill' style='background:#243B30;color:#9DB3A6'>0.7%</span></td>
+<td><span class='cell-pill' style='background:#21302A;color:#6B7A72'>0.1%</span></td>
+</tr>
+<tr>
+<td class='gridhdr'>2</td>
+<td><span class='cell-pill' style='background:#18A85A;color:#06210F'>14.9%</span></td>
+<td><span class='cell-pill' style='background:#18A85A;color:#06210F'>11.9%</span></td>
+<td><span class='cell-pill' style='background:#2C6B44;color:#DDEFE4'>2.2%</span></td>
+<td><span class='cell-pill' style='background:#2A4F38;color:#9DB3A6'>1.0%</span></td>
+<td><span class='cell-pill' style='background:#21302A;color:#6B7A72'>0.2%</span></td>
+</tr>
+<tr>
+<td class='gridhdr'>3</td>
+<td><span class='cell-pill' style='background:#18A85A;color:#06210F'>8.6%</span></td>
+<td><span class='cell-pill' style='background:#2E8C50;color:#DDEFE4'>7.0%</span></td>
+<td><span class='cell-pill' style='background:#2C6B44;color:#DDEFE4'>3.3%</span></td>
+<td><span class='cell-pill' style='background:#243B30;color:#9DB3A6'>0.6%</span></td>
+<td><span class='cell-pill' style='background:#21302A;color:#6B7A72'>0.2%</span></td>
+</tr>
+<tr>
+<td class='gridhdr'>4</td>
+<td><span class='cell-pill' style='background:#2C6B44;color:#DDEFE4'>3.8%</span></td>
+<td><span class='cell-pill' style='background:#2C6B44;color:#DDEFE4'>3.2%</span></td>
+<td><span class='cell-pill' style='background:#2A4F38;color:#9DB3A6'>1.5%</span></td>
+<td><span class='cell-pill' style='background:#243B30;color:#9DB3A6'>0.5%</span></td>
+<td><span class='cell-pill' style='background:#1F2A26;color:#6B7A72'>0.1%</span></td>
+</tr>
+<tr>
+<td class='gridhdr'>5</td>
+<td><span class='cell-pill' style='background:#2A4F38;color:#9DB3A6'>1.3%</span></td>
+<td><span class='cell-pill' style='background:#2A4F38;color:#9DB3A6'>1.2%</span></td>
+<td><span class='cell-pill' style='background:#243B30;color:#9DB3A6'>0.6%</span></td>
+<td><span class='cell-pill' style='background:#21302A;color:#6B7A72'>0.2%</span></td>
+<td><span class='cell-pill' style='background:#1F2A26;color:#6B7A72'>0.1%</span></td>
+</tr>
+<tr>
+<td class='gridhdr'>6</td>
+<td><span class='cell-pill' style='background:#21302A;color:#6B7A72'>0.4%</span></td>
+<td><span class='cell-pill' style='background:#21302A;color:#6B7A72'>0.4%</span></td>
+<td><span class='cell-pill' style='background:#21302A;color:#6B7A72'>0.2%</span></td>
+<td><span class='cell-pill' style='background:#1F2A26;color:#6B7A72'>0.1%</span></td>
+<td><span class='cell-pill' style='background:#1F2A26;color:#6B7A72'>0.0%</span></td>
+</tr>
+<tr>
+<td class='gridhdr'>7</td>
+<td><span class='cell-pill' style='background:#21302A;color:#6B7A72'>0.1%</span></td>
+<td><span class='cell-pill' style='background:#1F2A26;color:#6B7A72'>0.1%</span></td>
+<td><span class='cell-pill' style='background:#1F2A26;color:#6B7A72'>0.0%</span></td>
+<td><span class='cell-pill' style='background:#1F2A26;color:#6B7A72'>0.0%</span></td>
+<td><span class='cell-pill' style='background:#1F2A26;color:#6B7A72'>0.0%</span></td>
+</tr></table></div><div class='gridfooter'><strong>ADVANCE</strong> &mdash; COL <strong>81.8%</strong> &nbsp;|&nbsp; GHA <strong>18.2%</strong></div><div class='gridfooter'>OTHER (rarer scorelines): 0.18% &nbsp;|&nbsp; Most likely: <strong>COL 1-0 GHA (17.6%)</strong></div>
+      <h2>Correct Score (Top 12)</h2>
+<div class='bets-wrap bets-scroll'>
+<table class='bets'>
+<tr><th class='l'>Bet</th><th>Best Odds</th><th class='col-book'>Book</th><th>Model</th><th>Edge</th></tr>
+<tr><td class='bet-label'>COL 1&ndash;0 GHA</td><td class='odds'>&mdash;</td><td class='bookcell'><span class='bookchip bookchip-na'>&mdash;</span></td><td>16.0%</td><td class='edge-cell'>&mdash;</td></tr>
+<tr><td class='bet-label'>COL 2&ndash;0 GHA</td><td class='odds'>&mdash;</td><td class='bookcell'><span class='bookchip bookchip-na'>&mdash;</span></td><td>14.2%</td><td class='edge-cell'>&mdash;</td></tr>
+<tr><td class='bet-label'>COL 2&ndash;1 GHA</td><td class='odds'>&mdash;</td><td class='bookcell'><span class='bookchip bookchip-na'>&mdash;</span></td><td>9.6%</td><td class='edge-cell'>&mdash;</td></tr>
+<tr><td class='bet-label'>COL 1&ndash;1 GHA</td><td class='odds'>&mdash;</td><td class='bookcell'><span class='bookchip bookchip-na'>&mdash;</span></td><td>8.9%</td><td class='edge-cell'>&mdash;</td></tr>
+<tr><td class='bet-label'>COL 3&ndash;0 GHA</td><td class='odds'>&mdash;</td><td class='bookcell'><span class='bookchip bookchip-na'>&mdash;</span></td><td>8.4%</td><td class='edge-cell'>&mdash;</td></tr>
+<tr><td class='bet-label'>COL 0&ndash;0 GHA</td><td class='odds'>&mdash;</td><td class='bookcell'><span class='bookchip bookchip-na'>&mdash;</span></td><td>6.9%</td><td class='edge-cell'>&mdash;</td></tr>
+<tr><td class='bet-label'>COL 3&ndash;1 GHA</td><td class='odds'>&mdash;</td><td class='bookcell'><span class='bookchip bookchip-na'>&mdash;</span></td><td>6.1%</td><td class='edge-cell'>&mdash;</td></tr>
+<tr><td class='bet-label'>COL 0&ndash;1 GHA</td><td class='odds'>&mdash;</td><td class='bookcell'><span class='bookchip bookchip-na'>&mdash;</span></td><td>5.1%</td><td class='edge-cell'>&mdash;</td></tr>
+<tr><td class='bet-label'>COL 4&ndash;0 GHA</td><td class='odds'>&mdash;</td><td class='bookcell'><span class='bookchip bookchip-na'>&mdash;</span></td><td>3.7%</td><td class='edge-cell'>&mdash;</td></tr>
+<tr><td class='bet-label'>COL 2&ndash;2 GHA</td><td class='odds'>&mdash;</td><td class='bookcell'><span class='bookchip bookchip-na'>&mdash;</span></td><td>3.2%</td><td class='edge-cell'>&mdash;</td></tr>
+<tr><td class='bet-label'>COL 1&ndash;2 GHA</td><td class='odds'>&mdash;</td><td class='bookcell'><span class='bookchip bookchip-na'>&mdash;</span></td><td>3.0%</td><td class='edge-cell'>&mdash;</td></tr>
+<tr><td class='bet-label'>COL 4&ndash;1 GHA</td><td class='odds'>&mdash;</td><td class='bookcell'><span class='bookchip bookchip-na'>&mdash;</span></td><td>2.9%</td><td class='edge-cell'>&mdash;</td></tr>
+</table></div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="panel">
+      
+      
+      
+      
+      
+    </div>
+    <div class="panel">
+      
+      
+      
+      
+    </div>
+  </div>
+
+</div>
+</body></html>
